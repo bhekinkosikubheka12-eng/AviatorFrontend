@@ -1,0 +1,180 @@
+@if (isOpen) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-card glass-panel" (click)="$event.stopPropagation()">
+
+      @if (!isSuccessModal()) {
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <div class="header-info">
+            <div class="wallet-icon">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="5" width="20" height="14" rx="2"/>
+                <line x1="2" y1="10" x2="22" y2="10"/>
+              </svg>
+            </div>
+            <div>
+              <h2 class="modal-title">Deposit Funds</h2>
+              <span class="user-balance-pill">Current Balance: <strong>R{{ gameService.userBalance().toFixed(2) }}</strong></span>
+            </div>
+          </div>
+
+          <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Quick Amount Selector -->
+        <div class="section-block">
+          <label class="section-label">Select Amount (ZAR)</label>
+          <div class="quick-amounts-grid">
+            @for (amt of quickAmounts; track amt) {
+              <button 
+                type="button" 
+                class="amount-chip" 
+                [class.active]="depositAmount() === amt"
+                (click)="setQuickAmount(amt)">
+                R{{ amt }}
+              </button>
+            }
+          </div>
+
+          <div class="custom-amount-input">
+            <span class="currency-symbol">R</span>
+            <input 
+              type="number" 
+              placeholder="Custom amount" 
+              [value]="customAmount()" 
+              (input)="onCustomAmountChange($any($event.target).value)" 
+              min="10" 
+              max="50000">
+          </div>
+        </div>
+
+        <!-- Payment Methods List -->
+        <div class="section-block">
+          <label class="section-label">Choose Payment Method</label>
+          <div class="payment-methods-list">
+            @for (m of paymentMethods; track m.id) {
+              <div 
+                class="method-card" 
+                [class.selected]="selectedMethod() === m.id"
+                (click)="selectMethod(m.id)">
+                
+                <div class="method-radio">
+                  <div class="radio-dot"></div>
+                </div>
+
+                <div class="method-info">
+                  <div class="method-name-row">
+                    <span class="method-name">{{ m.name }}</span>
+                    <span class="badge" [class.badge-emerald]="m.badge === 'POPULAR' || m.badge === 'FASTEST'">{{ m.badge }}</span>
+                  </div>
+                  <div class="method-meta">
+                    <span>{{ m.fee }}</span>
+                    <span>•</span>
+                    <span class="time-text">{{ m.processingTime }}</span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Dynamic Payment Method Inputs -->
+        @if (selectedMethod() === 'VOUCHER_1V') {
+          <div class="method-details-box">
+            <label for="voucher-code" class="input-label">Enter 1Voucher / OTT 16-Digit PIN</label>
+            <input 
+              id="voucher-code" 
+              type="text" 
+              class="styled-input" 
+              placeholder="xxxx-xxxx-xxxx-xxxx"
+              [value]="voucherPin()"
+              (input)="voucherPin.set($any($event.target).value)">
+          </div>
+        }
+
+        @if (selectedMethod() === 'CAPITEC_PAY') {
+          <div class="method-details-box">
+            <label for="capitec-cell" class="input-label">Capitec Registered Cellphone Number</label>
+            <input 
+              id="capitec-cell" 
+              type="tel" 
+              class="styled-input" 
+              placeholder="082 123 4567"
+              [value]="userPhone()"
+              (input)="userPhone.set($any($event.target).value)">
+          </div>
+        }
+
+        <!-- Error Notification -->
+        @if (walletService.operationError()) {
+          <div class="alert alert-danger">
+            <span>{{ walletService.operationError() }}</span>
+          </div>
+        }
+
+        <!-- Deposit Submit CTA -->
+        <button 
+          type="button" 
+          class="btn-deposit-submit" 
+          [disabled]="walletService.isProcessing() || depositAmount() <= 0"
+          (click)="onDepositSubmit($event)">
+          @if (walletService.isProcessing()) {
+            <span class="spinner"></span>
+            <span>Processing Deposit...</span>
+          } @else {
+            <span>Pay & Deposit R{{ depositAmount().toFixed(2) }}</span>
+          }
+        </button>
+
+        <!-- Security Guarantee Footer -->
+        <div class="security-banner">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          <span>256-Bit SSL Encrypted Instant Payment Gateway</span>
+        </div>
+      }
+
+      <!-- SUCCESS RECEIPT VIEW -->
+      @if (isSuccessModal() && lastDepositDetails()) {
+        <div class="success-screen">
+          <div class="success-icon-circle">
+            <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+          </div>
+
+          <h3 class="success-title">Deposit Successful!</h3>
+          <p class="success-amount">+R{{ lastDepositDetails()?.amount?.toFixed(2) }}</p>
+          <span class="success-desc">Funds are immediately available in your Aviator balance.</span>
+
+          <div class="receipt-box">
+            <div class="receipt-row">
+              <span class="lbl">New Balance</span>
+              <span class="val highlight">R{{ gameService.userBalance().toFixed(2) }}</span>
+            </div>
+            <div class="receipt-row">
+              <span class="lbl">Method</span>
+              <span class="val">{{ lastDepositDetails()?.method }}</span>
+            </div>
+            <div class="receipt-row">
+              <span class="lbl">Reference</span>
+              <span class="val mono">{{ lastDepositDetails()?.txId }}</span>
+            </div>
+          </div>
+
+          <button type="button" class="btn-deposit-submit" (click)="finishDeposit()">
+            Return to Flight Simulator
+          </button>
+        </div>
+      }
+
+    </div>
+  </div>
+}

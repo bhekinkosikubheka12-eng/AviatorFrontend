@@ -1,0 +1,368 @@
+@if (isOpen) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-card glass-panel" (click)="$event.stopPropagation()">
+      
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <div class="brand-badge">
+          <div class="logo-circle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M12 2L2 19h20L12 2z" fill="#FF2A4D" stroke="#FF2A4D"/>
+              <path d="M12 6v10M9 13h6" stroke="#FFFFFF"/>
+            </svg>
+          </div>
+          <div>
+            <h2 class="modal-title">SMART<span class="highlight">BET</span></h2>
+            <p class="modal-subtitle">Aviator Pilot Terminal</p>
+          </div>
+        </div>
+
+        <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Segmented Navigation Tabs (Login / Register / Reset) -->
+      <div class="tab-switcher">
+        <button 
+          type="button" 
+          class="tab-btn" 
+          [class.active]="currentTab() === 'login'"
+          (click)="setTab('login')">
+          Sign In
+        </button>
+        <button 
+          type="button" 
+          class="tab-btn" 
+          [class.active]="currentTab() === 'register'"
+          (click)="setTab('register')">
+          Register
+        </button>
+        <button 
+          type="button" 
+          class="tab-btn" 
+          [class.active]="currentTab() === 'forgot'"
+          (click)="setTab('forgot')">
+          Reset
+        </button>
+      </div>
+
+      <!-- Balance Guarantee Badge for Registration -->
+      @if (currentTab() === 'register') {
+        <div class="bonus-banner">
+          <div class="bonus-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 6v6l4 2"/>
+            </svg>
+          </div>
+          <div class="bonus-text">
+            <strong>Instant Pilot Setup</strong>
+            <span>All accounts start with <strong>R0.00</strong> real balance. Deposit to play!</span>
+          </div>
+        </div>
+      }
+
+      <!-- Alert / Error Notification -->
+      @if (formError() || authService.authError()) {
+        <div class="alert alert-danger">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <span>{{ formError() || authService.authError() }}</span>
+        </div>
+      }
+
+      <!-- Success Notification -->
+      @if (resetSuccessMsg()) {
+        <div class="alert alert-success">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+          <span>{{ resetSuccessMsg() }}</span>
+        </div>
+      }
+
+      <!-- TAB 1: LOGIN FORM -->
+      @if (currentTab() === 'login') {
+        <form class="auth-form" (submit)="onLoginSubmit($event)">
+          <div class="form-group">
+            <label for="login-id">Email or Pilot Nickname</label>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+              </span>
+              <input 
+                id="login-id" 
+                type="text" 
+                placeholder="e.g. demo_pilot or user@smartbet.io"
+                [value]="loginIdentifier()" 
+                (input)="loginIdentifier.set($any($event.target).value)" 
+                autocomplete="username" 
+                required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="label-row">
+              <label for="login-pwd">Password</label>
+              <button type="button" class="link-btn" (click)="setTab('forgot')">Forgot Password?</button>
+            </div>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+              </span>
+              <input 
+                id="login-pwd" 
+                [type]="showPassword() ? 'text' : 'password'" 
+                placeholder="Enter your password"
+                [value]="loginPassword()" 
+                (input)="loginPassword.set($any($event.target).value)" 
+                autocomplete="current-password" 
+                required>
+              <button type="button" class="btn-toggle-eye" (click)="togglePasswordVisibility()">
+                @if (showPassword()) {
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                    <line x1="1" y1="1" x2="23" y2="23"/>
+                  </svg>
+                } @else {
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                }
+              </button>
+            </div>
+          </div>
+
+          <div class="remember-row">
+            <label class="custom-checkbox">
+              <input 
+                type="checkbox" 
+                [checked]="rememberMe()" 
+                (change)="rememberMe.set($any($event.target).checked)">
+              <span class="checkmark"></span>
+              <span class="label-text">Keep me signed in</span>
+            </label>
+          </div>
+
+          <button type="submit" class="btn-submit btn-primary" [disabled]="authService.isLoading()">
+            @if (authService.isLoading()) {
+              <span class="spinner"></span>
+              <span>Signing In...</span>
+            } @else {
+              <span>Take Flight (Sign In)</span>
+            }
+          </button>
+
+          <div class="auth-footer-prompt">
+            <span>Don't have an account?</span>
+            <button type="button" class="link-bold" (click)="setTab('register')">Register Now</button>
+          </div>
+        </form>
+      }
+
+      <!-- TAB 2: REGISTER FORM -->
+      @if (currentTab() === 'register') {
+        <form class="auth-form" (submit)="onRegisterSubmit($event)">
+          <div class="form-group">
+            <label for="reg-user">Pilot Nickname</label>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+              </span>
+              <input 
+                id="reg-user" 
+                type="text" 
+                placeholder="Choose nickname (e.g. AviatorAce)"
+                [value]="regUsername()" 
+                (input)="regUsername.set($any($event.target).value)" 
+                autocomplete="username" 
+                required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="reg-mail">Email Address</label>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                  <polyline points="22,6 12,13 2,6"/>
+                </svg>
+              </span>
+              <input 
+                id="reg-mail" 
+                type="email" 
+                placeholder="you@domain.com"
+                [value]="regEmail()" 
+                (input)="regEmail.set($any($event.target).value)" 
+                autocomplete="email" 
+                required>
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="reg-pwd">Password</label>
+              <div class="input-wrapper">
+                <input 
+                  id="reg-pwd" 
+                  [type]="showPassword() ? 'text' : 'password'" 
+                  placeholder="Min 6 chars"
+                  [value]="regPassword()" 
+                  (input)="regPassword.set($any($event.target).value)" 
+                  autocomplete="new-password" 
+                  required>
+                <button type="button" class="btn-toggle-eye" (click)="togglePasswordVisibility()">
+                  @if (showPassword()) {
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                      <line x1="1" y1="1" x2="23" y2="23"/>
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                    </svg>
+                  } @else {
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="3"/>
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    </svg>
+                  }
+                </button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="reg-cpwd">Confirm Password</label>
+              <div class="input-wrapper">
+                <input 
+                  id="reg-cpwd" 
+                  [type]="showConfirmPassword() ? 'text' : 'password'" 
+                  placeholder="Repeat password"
+                  [value]="regConfirmPassword()" 
+                  (input)="regConfirmPassword.set($any($event.target).value)" 
+                  autocomplete="new-password" 
+                  required>
+                <button type="button" class="btn-toggle-eye" (click)="toggleConfirmPasswordVisibility()">
+                  @if (showConfirmPassword()) {
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                      <line x1="1" y1="1" x2="23" y2="23"/>
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                    </svg>
+                  } @else {
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="3"/>
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    </svg>
+                  }
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="terms-row">
+            <label class="custom-checkbox">
+              <input 
+                type="checkbox" 
+                [checked]="agreeTerms()" 
+                (change)="agreeTerms.set($any($event.target).checked)">
+              <span class="checkmark"></span>
+              <span class="label-text">I am 18+ and agree to the Terms & Responsible Gaming Policy</span>
+            </label>
+          </div>
+
+          <button type="submit" class="btn-submit btn-accent" [disabled]="authService.isLoading()">
+            @if (authService.isLoading()) {
+              <span class="spinner"></span>
+              <span>Creating Pilot Account...</span>
+            } @else {
+              <span>Create Account & Start (R0.00)</span>
+            }
+          </button>
+
+          <div class="auth-footer-prompt">
+            <span>Already registered?</span>
+            <button type="button" class="link-bold" (click)="setTab('login')">Sign In</button>
+          </div>
+        </form>
+      }
+
+      <!-- TAB 3: RESET PASSWORD FORM -->
+      @if (currentTab() === 'forgot') {
+        <form class="auth-form" (submit)="onResetSubmit($event)">
+          <p class="reset-desc">
+            Enter your registered email address and we will instantly send you a password reset link or update your security credentials.
+          </p>
+
+          <div class="form-group">
+            <label for="reset-mail">Registered Email</label>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                  <polyline points="22,6 12,13 2,6"/>
+                </svg>
+              </span>
+              <input 
+                id="reset-mail" 
+                type="email" 
+                placeholder="you@domain.com"
+                [value]="resetEmail()" 
+                (input)="resetEmail.set($any($event.target).value)" 
+                autocomplete="email" 
+                required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="reset-npwd">New Password (Optional direct reset)</label>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+              </span>
+              <input 
+                id="reset-npwd" 
+                type="password" 
+                placeholder="Enter new password to update directly"
+                [value]="newPassword()" 
+                (input)="newPassword.set($any($event.target).value)" 
+                autocomplete="new-password">
+            </div>
+          </div>
+
+          <button type="submit" class="btn-submit btn-primary" [disabled]="authService.isLoading()">
+            @if (authService.isLoading()) {
+              <span class="spinner"></span>
+              <span>Sending Reset...</span>
+            } @else {
+              <span>Send Password Reset</span>
+            }
+          </button>
+
+          <div class="auth-footer-prompt">
+            <span>Remembered your password?</span>
+            <button type="button" class="link-bold" (click)="setTab('login')">Back to Sign In</button>
+          </div>
+        </form>
+      }
+
+    </div>
+  </div>
+}

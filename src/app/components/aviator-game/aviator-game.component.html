@@ -1,0 +1,581 @@
+<div class="aviator-container">
+  
+  <!-- Header / Navigation Bar -->
+  <header class="game-header glass-panel">
+    <div class="brand-section">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M12 2L2 19h20L12 2z" fill="#FF2A4D" stroke="#FF2A4D"/>
+          <path d="M12 6v10M9 13h6" stroke="#FFFFFF"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <span class="brand-title">SMART<span class="highlight">BET</span></span>
+        <span class="brand-subtitle">AVIATOR</span>
+      </div>
+    </div>
+
+    <!-- Header Actions & Balance -->
+    <div class="header-actions">
+      <!-- Balance Card (Clickable to trigger Deposit) -->
+      <div class="balance-card" (click)="openDepositModal()" title="Click to Deposit Funds">
+        <span class="balance-label">BALANCE</span>
+        <span class="balance-value">R{{ gameService.userBalance().toFixed(2) }}</span>
+      </div>
+
+      <!-- Deposit Action Button -->
+      <button type="button" class="btn-header-deposit" (click)="openDepositModal()" title="Deposit Real Funds">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        <span class="btn-text">Deposit</span>
+      </button>
+
+      <!-- Withdraw Action Button -->
+      <button type="button" class="btn-header-withdraw" (click)="openWithdrawModal()" title="Withdraw Balance">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+        </svg>
+        <span class="btn-text">Withdraw</span>
+      </button>
+
+      <!-- User Profile / Auth State Button -->
+      @if (authService.isLoggedIn()) {
+        <div class="user-menu-wrapper">
+          <button type="button" class="user-pill-btn" (click)="toggleUserMenu()" title="Account Settings">
+            <div class="user-avatar-mini">
+              {{ authService.currentUser()?.userName?.charAt(0)?.toUpperCase() || 'P' }}
+            </div>
+            <span class="pilot-name">{{ authService.currentUser()?.userName }}</span>
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
+
+          @if (isUserMenuOpen()) {
+            <div class="user-dropdown glass-panel" (click)="$event.stopPropagation()">
+              <div class="dropdown-header">
+                <span class="dropdown-pilot-name">{{ authService.currentUser()?.userName }}</span>
+                <span class="dropdown-email">{{ authService.currentUser()?.email || 'Registered Pilot' }}</span>
+                <div class="dropdown-balance">R{{ gameService.userBalance().toFixed(2) }}</div>
+              </div>
+              <div class="dropdown-divider"></div>
+              <button type="button" class="dropdown-item" (click)="openDepositModal()">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="2" y="5" width="20" height="14" rx="2"/>
+                  <line x1="2" y1="10" x2="22" y2="10"/>
+                </svg>
+                <span>Deposit Funds</span>
+              </button>
+              <button type="button" class="dropdown-item" (click)="openWithdrawModal()">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                </svg>
+                <span>Withdraw Payout</span>
+              </button>
+              <div class="dropdown-divider"></div>
+              <button type="button" class="dropdown-item logout-item" (click)="logoutUser()">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                  <polyline points="16 17 21 12 16 7"/>
+                  <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+                <span>Sign Out</span>
+              </button>
+            </div>
+          }
+        </div>
+      } @else {
+        <button type="button" class="btn-header-auth" (click)="openAuthModal('login')">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+          <span class="auth-btn-label">Sign In / Register</span>
+        </button>
+      }
+
+      <!-- Provably Fair Button -->
+      <button type="button" class="icon-button" (click)="openVerifyModal()" title="Provably Fair Verifier">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+      </button>
+
+      <!-- Sound Toggle -->
+      <button type="button" class="icon-button" (click)="gameService.toggleSound()" title="Sound Toggle">
+        @if (gameService.soundEnabled()) {
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+          </svg>
+        } @else {
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <line x1="23" y1="9" x2="17" y2="15"/>
+            <line x1="17" y1="9" x2="23" y2="15"/>
+          </svg>
+        }
+      </button>
+
+      <!-- Connection Status Badge -->
+      <div class="connection-indicator" [attr.data-status]="gameService.connectionState()" [title]="'Connection: ' + gameService.connectionState()">
+        <span class="status-dot"></span>
+      </div>
+    </div>
+  </header>
+
+
+  <!-- Multiplier History Ribbon Bar (Mobile & Desktop Responsive) -->
+  <div class="history-ribbon-bar glass-panel">
+    <div class="history-scroll">
+      @for (item of gameService.roundHistory(); track item.roundId) {
+        <button 
+          type="button"
+          class="history-badge" 
+          [ngClass]="getMultiplierBadgeClass(item.crashMultiplier)"
+          (click)="openVerifyModal(item)"
+          title="Click to verify Provably Fair seed">
+          {{ item.crashMultiplier.toFixed(2) }}x
+        </button>
+      }
+      @if (gameService.roundHistory().length === 0) {
+        <span class="history-placeholder">Awaiting round history...</span>
+      }
+    </div>
+  </div>
+
+  <!-- Main Game Workspace Layout -->
+  <main class="game-main-content">
+    
+    <!-- Stage: Canvas Flight Simulator & Dual Bet Controls (Top Priority on Mobile) -->
+    <section class="game-stage">
+      
+      <!-- Canvas Display Box -->
+      <div class="canvas-wrapper glass-panel">
+        <canvas #gameCanvas></canvas>
+
+        <!-- Pre-commitment Hash Display Bar -->
+        <div class="seed-hash-footer">
+          <span class="hash-tag">SHA-256:</span>
+          <span class="hash-string">{{ gameService.preCommitmentHash() || 'Generating seed commitment...' }}</span>
+          <span class="round-indicator">#{{ gameService.currentRoundId() || '000000' }}</span>
+        </div>
+      </div>
+
+      <!-- Dual Betting Panels -->
+      <div class="betting-panels-grid">
+        
+        <!-- BETTING PANEL 1 -->
+        <div class="bet-panel glass-panel" [class.panel-placed]="panel1().isPlaced" [class.panel-cashed]="panel1().hasCashedOut">
+          <div class="panel-layout">
+            
+            <!-- Controls Block -->
+            <div class="panel-inputs">
+              <!-- Top Row: Stepper & Auto Cashout -->
+              <div class="inputs-top-row">
+                <!-- Amount Input & Quick Steps -->
+                <div class="numeric-input-wrapper">
+                  <button type="button" class="step-btn" (click)="adjustAmount(0, -10)" [disabled]="panel1().isPlaced">-</button>
+                  <input 
+                    type="number" 
+                    min="1" 
+                    step="5" 
+                    [(ngModel)]="panel1().amount" 
+                    [disabled]="panel1().isPlaced"
+                    class="amount-input" />
+                  <button type="button" class="step-btn" (click)="adjustAmount(0, 10)" [disabled]="panel1().isPlaced">+</button>
+                </div>
+
+                <!-- Auto Cashout Block -->
+                <div class="auto-cashout-block">
+                  <div class="switch-row">
+                    <label class="switch-container">
+                      <input 
+                        type="checkbox" 
+                        [checked]="panel1().autoCashoutEnabled" 
+                        (change)="toggleAutoCashout(0)"
+                        [disabled]="panel1().isPlaced">
+                      <span class="switch-slider"></span>
+                    </label>
+                    <span class="switch-label">Auto</span>
+                  </div>
+
+                  <div class="mult-input-wrapper" [class.disabled]="!panel1().autoCashoutEnabled || panel1().isPlaced">
+                    <input 
+                      type="number" 
+                      min="1.01" 
+                      step="0.1" 
+                      [(ngModel)]="panel1().autoCashoutMultiplier" 
+                      [disabled]="!panel1().autoCashoutEnabled || panel1().isPlaced"
+                      class="auto-mult-input" />
+                    <span class="mult-suffix">x</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quick Chips -->
+              <div class="quick-chips-row">
+                @for (chip of quickBets; track chip) {
+                  <button type="button" class="chip-btn" (click)="adjustAmount(0, chip)" [disabled]="panel1().isPlaced">+{{ chip }}</button>
+                }
+                <button type="button" class="chip-btn" (click)="multiplyAmount(0, 0.5)" [disabled]="panel1().isPlaced">½</button>
+                <button type="button" class="chip-btn" (click)="multiplyAmount(0, 2)" [disabled]="panel1().isPlaced">2X</button>
+                <button type="button" class="chip-btn" (click)="setMaxAmount(0)" [disabled]="panel1().isPlaced">MAX</button>
+              </div>
+            </div>
+
+            <!-- Big Reactive Action Button -->
+            <div class="action-btn-wrapper">
+              
+              <!-- State 1: Ready to Bet during Waiting phase -->
+              @if (gameService.isWaiting() && !panel1().isPlaced) {
+                <button type="button" class="action-btn btn-place-bet" (click)="onPanelActionClick(0)">
+                  <span class="btn-primary-text">BET</span>
+                  <span class="btn-sub-text">R{{ panel1().amount.toFixed(2) }}</span>
+                </button>
+              }
+
+              <!-- State 2: Bet Placed, waiting for round flight -->
+              @if (gameService.isWaiting() && panel1().isPlaced) {
+                <button type="button" class="action-btn btn-waiting" disabled>
+                  <span class="btn-primary-text">WAITING</span>
+                  <span class="btn-sub-text">Starting...</span>
+                </button>
+              }
+
+              <!-- State 3: Active Flight & Cashout Available -->
+              @if (gameService.isFlying() && panel1().isPlaced && !panel1().hasCashedOut) {
+                <button type="button" class="action-btn btn-cashout pulse-glow" (click)="onPanelActionClick(0)">
+                  <span class="btn-primary-text">CASHOUT</span>
+                  <span class="btn-win-text">+R{{ (panel1().amount * gameService.currentMultiplier()).toFixed(2) }}</span>
+                </button>
+              }
+
+              <!-- State 4: Already Cashed Out this round -->
+              @if (panel1().isPlaced && panel1().hasCashedOut) {
+                <button type="button" class="action-btn btn-cashed-success" disabled>
+                  <span class="btn-primary-text">CASHED OUT</span>
+                  <span class="btn-win-text">+R{{ panel1().lastWinAmount?.toFixed(2) }}</span>
+                </button>
+              }
+
+              <!-- State 5: Round Flying but no bet placed -->
+              @if (gameService.isFlying() && !panel1().isPlaced) {
+                <button type="button" class="action-btn btn-disabled-flight" disabled>
+                  <span class="btn-primary-text">IN FLIGHT</span>
+                  <span class="btn-sub-text">Next Round</span>
+                </button>
+              }
+
+              <!-- State 6: Crashed -->
+              @if (gameService.isCrashed()) {
+                <button type="button" class="action-btn btn-crashed" disabled>
+                  <span class="btn-primary-text">CRASHED</span>
+                  <span class="btn-sub-text">{{ gameService.currentMultiplier().toFixed(2) }}x</span>
+                </button>
+              }
+
+            </div>
+
+          </div>
+        </div>
+
+        <!-- BETTING PANEL 2 -->
+        <div class="bet-panel glass-panel" [class.panel-placed]="panel2().isPlaced" [class.panel-cashed]="panel2().hasCashedOut">
+          <div class="panel-layout">
+            
+            <!-- Controls Block -->
+            <div class="panel-inputs">
+              <!-- Top Row: Stepper & Auto Cashout -->
+              <div class="inputs-top-row">
+                <!-- Amount Input & Quick Steps -->
+                <div class="numeric-input-wrapper">
+                  <button type="button" class="step-btn" (click)="adjustAmount(1, -10)" [disabled]="panel2().isPlaced">-</button>
+                  <input 
+                    type="number" 
+                    min="1" 
+                    step="5" 
+                    [(ngModel)]="panel2().amount" 
+                    [disabled]="panel2().isPlaced"
+                    class="amount-input" />
+                  <button type="button" class="step-btn" (click)="adjustAmount(1, 10)" [disabled]="panel2().isPlaced">+</button>
+                </div>
+
+                <!-- Auto Cashout Block -->
+                <div class="auto-cashout-block">
+                  <div class="switch-row">
+                    <label class="switch-container">
+                      <input 
+                        type="checkbox" 
+                        [checked]="panel2().autoCashoutEnabled" 
+                        (change)="toggleAutoCashout(1)"
+                        [disabled]="panel2().isPlaced">
+                      <span class="switch-slider"></span>
+                    </label>
+                    <span class="switch-label">Auto</span>
+                  </div>
+
+                  <div class="mult-input-wrapper" [class.disabled]="!panel2().autoCashoutEnabled || panel2().isPlaced">
+                    <input 
+                      type="number" 
+                      min="1.01" 
+                      step="0.1" 
+                      [(ngModel)]="panel2().autoCashoutMultiplier" 
+                      [disabled]="!panel2().autoCashoutEnabled || panel2().isPlaced"
+                      class="auto-mult-input" />
+                    <span class="mult-suffix">x</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quick Chips -->
+              <div class="quick-chips-row">
+                @for (chip of quickBets; track chip) {
+                  <button type="button" class="chip-btn" (click)="adjustAmount(1, chip)" [disabled]="panel2().isPlaced">+{{ chip }}</button>
+                }
+                <button type="button" class="chip-btn" (click)="multiplyAmount(1, 0.5)" [disabled]="panel2().isPlaced">½</button>
+                <button type="button" class="chip-btn" (click)="multiplyAmount(1, 2)" [disabled]="panel2().isPlaced">2X</button>
+                <button type="button" class="chip-btn" (click)="setMaxAmount(1)" [disabled]="panel2().isPlaced">MAX</button>
+              </div>
+            </div>
+
+            <!-- Big Reactive Action Button -->
+            <div class="action-btn-wrapper">
+              
+              <!-- State 1: Ready to Bet during Waiting phase -->
+              @if (gameService.isWaiting() && !panel2().isPlaced) {
+                <button type="button" class="action-btn btn-place-bet" (click)="onPanelActionClick(1)">
+                  <span class="btn-primary-text">BET</span>
+                  <span class="btn-sub-text">R{{ panel2().amount.toFixed(2) }}</span>
+                </button>
+              }
+
+              <!-- State 2: Bet Placed, waiting for round flight -->
+              @if (gameService.isWaiting() && panel2().isPlaced) {
+                <button type="button" class="action-btn btn-waiting" disabled>
+                  <span class="btn-primary-text">WAITING</span>
+                  <span class="btn-sub-text">Starting...</span>
+                </button>
+              }
+
+              <!-- State 3: Active Flight & Cashout Available -->
+              @if (gameService.isFlying() && panel2().isPlaced && !panel2().hasCashedOut) {
+                <button type="button" class="action-btn btn-cashout pulse-glow" (click)="onPanelActionClick(1)">
+                  <span class="btn-primary-text">CASHOUT</span>
+                  <span class="btn-win-text">+R{{ (panel2().amount * gameService.currentMultiplier()).toFixed(2) }}</span>
+                </button>
+              }
+
+              <!-- State 4: Already Cashed Out this round -->
+              @if (panel2().isPlaced && panel2().hasCashedOut) {
+                <button type="button" class="action-btn btn-cashed-success" disabled>
+                  <span class="btn-primary-text">CASHED OUT</span>
+                  <span class="btn-win-text">+R{{ panel2().lastWinAmount?.toFixed(2) }}</span>
+                </button>
+              }
+
+              <!-- State 5: Round Flying but no bet placed -->
+              @if (gameService.isFlying() && !panel2().isPlaced) {
+                <button type="button" class="action-btn btn-disabled-flight" disabled>
+                  <span class="btn-primary-text">IN FLIGHT</span>
+                  <span class="btn-sub-text">Next Round</span>
+                </button>
+              }
+
+              <!-- State 6: Crashed -->
+              @if (gameService.isCrashed()) {
+                <button type="button" class="action-btn btn-crashed" disabled>
+                  <span class="btn-primary-text">CRASHED</span>
+                  <span class="btn-sub-text">{{ gameService.currentMultiplier().toFixed(2) }}x</span>
+                </button>
+              }
+
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- Multiplayer Bet Board (Mobile: Below Betting Controls; Desktop: Left Side Panel) -->
+    <aside class="multiplayer-board glass-panel">
+      <div class="board-header">
+        <div class="tabs-group">
+          <button 
+            type="button" 
+            class="tab-btn" 
+            [class.active]="activeTab() === 'all'" 
+            (click)="activeTab.set('all')">
+            All Bets
+          </button>
+          <button 
+            type="button" 
+            class="tab-btn" 
+            [class.active]="activeTab() === 'my'" 
+            (click)="activeTab.set('my')">
+            My Bets
+          </button>
+          <button 
+            type="button" 
+            class="tab-btn" 
+            [class.active]="activeTab() === 'top'" 
+            (click)="activeTab.set('top')">
+            Top Wins
+          </button>
+        </div>
+
+        <div class="board-stats">
+          <span class="stats-item">
+            <strong class="stats-num">{{ activePlayerCount() }}</strong> Pilots
+          </span>
+          <span class="stats-item">
+            Vol: <strong class="stats-num">R{{ totalRoundWagered().toFixed(0) }}</strong>
+          </span>
+        </div>
+      </div>
+
+      <!-- Live Bets Table List -->
+      <div class="board-table-container">
+        <table class="bets-table">
+          <thead>
+            <tr>
+              <th>Pilot</th>
+              <th>Bet</th>
+              <th>Mult</th>
+              <th class="text-right">Win</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (bet of displayedBets(); track bet.betId) {
+              <tr [class.cashed-out]="bet.winAmount && bet.winAmount > 0" [class.my-row]="bet.userId === gameService.userId()">
+                <td class="pilot-cell">
+                  <div class="pilot-avatar">{{ bet.userName.substring(0, 2).toUpperCase() }}</div>
+                  <span class="pilot-name">{{ bet.userName }}</span>
+                </td>
+                <td class="amount-cell">R{{ bet.amount.toFixed(2) }}</td>
+                <td class="multiplier-cell">
+                  @if (bet.cashoutMultiplier) {
+                    <span class="mult-tag" [ngClass]="getMultiplierBadgeClass(bet.cashoutMultiplier)">
+                      {{ bet.cashoutMultiplier.toFixed(2) }}x
+                    </span>
+                  } @else {
+                    <span class="mult-pending">-</span>
+                  }
+                </td>
+                <td class="win-cell text-right">
+                  @if (bet.winAmount) {
+                    <span class="win-val">+R{{ bet.winAmount.toFixed(2) }}</span>
+                  } @else {
+                    <span class="win-pending">-</span>
+                  }
+                </td>
+              </tr>
+            }
+            @if (displayedBets().length === 0) {
+              <tr>
+                <td colspan="4" class="empty-state">No bets active in current round</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </aside>
+
+  </main>
+
+  <!-- Provably Fair Verifier Modal -->
+  @if (isVerifyModalOpen()) {
+    <div class="modal-backdrop" (click)="closeVerifyModal()">
+      <div class="modal-dialog glass-panel" (click)="$event.stopPropagation()">
+        
+        <div class="modal-header">
+          <div class="modal-title-group">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#FF2A4D" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            <h3>Provably Fair SHA-512 Verification</h3>
+          </div>
+          <button type="button" class="close-btn" (click)="closeVerifyModal()">✕</button>
+        </div>
+
+        <div class="modal-body">
+          <p class="modal-desc">
+            Verify the mathematical integrity of any round. The crash point is deterministically calculated using 
+            <code>HMAC-SHA512(ServerSeed, ClientSeed:RoundId)</code> with 96% RTP and 4% instant crash rate.
+          </p>
+
+          <div class="form-group">
+            <label>Server Seed (Revealed after crash):</label>
+            <input type="text" [(ngModel)]="verifyServerSeed" placeholder="64 hex character seed" class="form-input mono-font" />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group half">
+              <label>Client Seed:</label>
+              <input type="text" [(ngModel)]="verifyClientSeed" placeholder="Client Seed" class="form-input mono-font" />
+            </div>
+            <div class="form-group half">
+              <label>Round ID:</label>
+              <input type="text" [(ngModel)]="verifyRoundId" placeholder="e.g. 9f4a18b2c4e1" class="form-input mono-font" />
+            </div>
+          </div>
+
+          <button 
+            type="button" 
+            class="verify-action-btn" 
+            [disabled]="isVerifying()" 
+            (click)="runProvablyFairVerification()">
+            {{ isVerifying() ? 'Verifying Hashes...' : 'Verify Round Multiplier' }}
+          </button>
+
+          @if (verifyResult()) {
+            <div class="verification-results-box" [class.success]="verifyResult()?.isValid">
+              <div class="result-row">
+                <span class="result-label">Computed Multiplier:</span>
+                <span class="result-value mult-highlight">{{ verifyResult()?.multiplier?.toFixed(2) }}x</span>
+              </div>
+              <div class="result-row">
+                <span class="result-label">Instant Crash (1.00x):</span>
+                <span class="result-value">{{ verifyResult()?.isInstantCrash ? 'YES (4% House Edge)' : 'NO' }}</span>
+              </div>
+              <div class="result-row">
+                <span class="result-label">SHA-256 Pre-Commitment:</span>
+                <span class="result-value hash-code">{{ verifyResult()?.preCommitmentHash }}</span>
+              </div>
+              <div class="result-row">
+                <span class="result-label">HMAC-SHA512 Output:</span>
+                <span class="result-value hash-code">{{ verifyResult()?.combinedHash }}</span>
+              </div>
+            </div>
+          }
+        </div>
+
+      </div>
+    </div>
+  }
+
+  <!-- Authentication Modal (Sign In / Register / Reset Password) -->
+  <app-auth-modal 
+    [isOpen]="isAuthModalOpen()" 
+    [initialTab]="authInitialTab()"
+    (close)="closeAuthModal()">
+  </app-auth-modal>
+
+  <!-- Deposit Modal -->
+  <app-deposit-modal 
+    [isOpen]="isDepositModalOpen()" 
+    (close)="closeDepositModal()">
+  </app-deposit-modal>
+
+  <!-- Withdraw Modal -->
+  <app-withdraw-modal 
+    [isOpen]="isWithdrawModalOpen()" 
+    (close)="closeWithdrawModal()">
+  </app-withdraw-modal>
+
+</div>
+

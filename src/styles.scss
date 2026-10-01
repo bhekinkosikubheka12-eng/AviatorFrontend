@@ -1,0 +1,160 @@
+:root {
+  /* Canvas & Surface Architecture */
+  --bg-void: #0A0D12;
+  --bg-surface-l1: #141822;
+  --bg-surface-l2: #1E2432;
+  --border-subtle: #2A3245;
+
+  /* Brand & High-Chroma Accents */
+  --emerald-primary: #28C04D;
+  --cyber-azure: #00D2FF;
+  --crimson-flare: #E61C5A;
+
+  /* Typography Tokens */
+  --text-primary: #FFFFFF;
+  --text-muted: #94A3B8;
+
+  /* Geometry Tokens */
+  --radius-btn: 8px;
+  --radius-card: 12px;
+
+  /* Surface and Background mappings */
+  --bg-obsidian-deep: var(--bg-void);
+  --bg-obsidian: var(--bg-surface-l1);
+  --bg-surface-slate: var(--bg-surface-l1);
+  --bg-surface-elevated: var(--bg-surface-l2);
+  --bg-surface-glass: rgba(20, 24, 34, 0.82);
+  --bg-surface-subtle: rgba(255, 255, 255, 0.03);
+
+  /* Borders & Dividers */
+  --border-accent: rgba(230, 28, 90, 0.4);
+  --border-emerald: rgba(40, 192, 77, 0.4);
+  --border-amber: rgba(255, 179, 0, 0.4);
+
+  /* Accent Mappings */
+  --neon-crimson: var(--crimson-flare);
+  --neon-crimson-glow: rgba(230, 28, 90, 0.4);
+  --neon-emerald: var(--emerald-primary);
+  --neon-emerald-glow: rgba(40, 192, 77, 0.4);
+  --cyber-amber: #FFB300;
+  --cyber-amber-glow: rgba(255, 179, 0, 0.4);
+  --electric-cyan: var(--cyber-azure);
+  --electric-cyan-glow: rgba(0, 210, 255, 0.4);
+  --royal-purple: #9D4EDD;
+  --royal-purple-glow: rgba(157, 78, 221, 0.4);
+
+  /* Typography Colors */
+  --text-secondary: var(--text-muted);
+  --text-inverse: #0A0D12;
+
+  /* Radii */
+  --radius-sm: var(--radius-btn);
+  --radius-md: var(--radius-card);
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  /* Typography Families */
+  --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Outfit', 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Shadows */
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.6);
+  --shadow-glow-crimson: 0 0 24px rgba(230, 28, 90, 0.35);
+  --shadow-glow-emerald: 0 0 24px rgba(40, 192, 77, 0.35);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-void);
+  color: var(--text-primary);
+  font-family: var(--font-main);
+  font-size: 14px;
+  line-height: 1.5;
+  user-select: none;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-void);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-subtle);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3A455E;
+}
+
+/* Glassmorphism helpers */
+.glass-panel {
+  background: var(--bg-surface-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+/* Button & Interactive styles */
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  &:active {
+    transform: scale(0.97);
+  }
+}
+
+input, select {
+  font-family: inherit;
+  outline: none;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface-l1);
+  color: var(--text-primary);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+  &:focus {
+    border-color: var(--crimson-flare);
+    box-shadow: 0 0 0 2px var(--neon-crimson-glow);
+  }
+}
+
+/* Glow Keyframes */
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.8;
+    filter: drop-shadow(0 0 10px var(--crimson-flare));
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 25px var(--crimson-flare));
+  }
+}
+
+@keyframes ribbonFloat {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+  100% { transform: translateY(0); }
+}

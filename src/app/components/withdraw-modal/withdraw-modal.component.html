@@ -1,0 +1,219 @@
+@if (isOpen) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-card glass-panel" (click)="$event.stopPropagation()">
+
+      @if (!isSuccessModal()) {
+        <!-- Header -->
+        <div class="modal-header">
+          <div class="header-info">
+            <div class="withdraw-icon">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+              </svg>
+            </div>
+            <div>
+              <h2 class="modal-title">Withdraw Winnings</h2>
+              <span class="user-balance-pill">Available Balance: <strong>R{{ gameService.userBalance().toFixed(2) }}</strong></span>
+            </div>
+          </div>
+
+          <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Withdrawal Method Selector -->
+        <div class="section-block">
+          <label class="section-label">Withdrawal Destination</label>
+          <div class="methods-list">
+            @for (m of withdrawalMethods; track m.id) {
+              <div 
+                class="method-card" 
+                [class.selected]="selectedMethod() === m.id"
+                (click)="selectMethod(m.id)">
+                <div class="method-radio">
+                  <div class="radio-dot"></div>
+                </div>
+                <div class="method-info">
+                  <div class="method-name-row">
+                    <span class="method-name">{{ m.name }}</span>
+                    <span class="badge">{{ m.badge }}</span>
+                  </div>
+                  <div class="method-meta">
+                    <span>Min: R{{ m.minAmount }}</span>
+                    <span>•</span>
+                    <span class="time-text">{{ m.processingTime }}</span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Amount & Quick Percentage Chips -->
+        <div class="section-block">
+          <div class="amount-header-row">
+            <label class="section-label">Amount (ZAR)</label>
+            <span class="min-hint">Min R50.00</span>
+          </div>
+
+          <div class="custom-amount-input">
+            <span class="currency-symbol">R</span>
+            <input 
+              type="number" 
+              placeholder="0.00" 
+              [value]="customAmount()" 
+              (input)="onCustomAmountChange($any($event.target).value)" 
+              min="50" 
+              [max]="gameService.userBalance()">
+          </div>
+
+          <div class="pct-chips-row">
+            <button type="button" class="pct-chip" (click)="setPercentage(25)">25%</button>
+            <button type="button" class="pct-chip" (click)="setPercentage(50)">50%</button>
+            <button type="button" class="pct-chip" (click)="setPercentage(75)">75%</button>
+            <button type="button" class="pct-chip max-chip" (click)="setPercentage(100)">MAX (100%)</button>
+          </div>
+        </div>
+
+        <!-- Dynamic Destination Form -->
+        @if (selectedMethod() === 'EFT_BANK') {
+          <div class="dest-form">
+            <div class="form-group">
+              <label for="bank-select">Select South African Bank</label>
+              <select id="bank-select" class="styled-select" [value]="bankName()" (change)="bankName.set($any($event.target).value)">
+                @for (bank of southAfricanBanks; track bank) {
+                  <option [value]="bank">{{ bank }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="acc-num">Bank Account Number</label>
+              <input 
+                id="acc-num" 
+                type="text" 
+                class="styled-input" 
+                placeholder="e.g. 1058293849"
+                [value]="accountNumber()" 
+                (input)="accountNumber.set($any($event.target).value)" 
+                required>
+            </div>
+
+            <div class="form-group">
+              <label for="acc-holder">Account Holder Name</label>
+              <input 
+                id="acc-holder" 
+                type="text" 
+                class="styled-input" 
+                placeholder="Full Name / Company"
+                [value]="accountHolder()" 
+                (input)="accountHolder.set($any($event.target).value)">
+            </div>
+          </div>
+        }
+
+        @if (selectedMethod() === 'EWALLET_FNB') {
+          <div class="dest-form">
+            <div class="form-group">
+              <label for="mobile-num">Cash Send Cellphone Number</label>
+              <input 
+                id="mobile-num" 
+                type="tel" 
+                class="styled-input" 
+                placeholder="e.g. 082 123 4567"
+                [value]="mobileNumber()" 
+                (input)="mobileNumber.set($any($event.target).value)" 
+                required>
+            </div>
+            <p class="field-hint">You will receive an SMS with an ATM withdrawal PIN within 15 minutes.</p>
+          </div>
+        }
+
+        @if (selectedMethod() === 'CRYPTO_USDT') {
+          <div class="dest-form">
+            <div class="form-group">
+              <label for="crypto-addr">USDT (TRC-20) Destination Address</label>
+              <input 
+                id="crypto-addr" 
+                type="text" 
+                class="styled-input" 
+                placeholder="Txxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                [value]="cryptoAddress()" 
+                (input)="cryptoAddress.set($any($event.target).value)" 
+                required>
+            </div>
+          </div>
+        }
+
+        <!-- Error Notification -->
+        @if (walletService.operationError()) {
+          <div class="alert alert-danger">
+            <span>{{ walletService.operationError() }}</span>
+          </div>
+        }
+
+        <!-- Withdraw Submit CTA -->
+        <button 
+          type="button" 
+          class="btn-withdraw-submit" 
+          [disabled]="walletService.isProcessing() || withdrawAmount() < 50 || withdrawAmount() > gameService.userBalance()"
+          (click)="onWithdrawSubmit($event)">
+          @if (walletService.isProcessing()) {
+            <span class="spinner"></span>
+            <span>Processing Payout...</span>
+          } @else {
+            <span>Withdraw R{{ withdrawAmount().toFixed(2) }}</span>
+          }
+        </button>
+
+        <!-- Guarantee Note -->
+        <div class="security-banner">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          <span>Licensed Payout Gateway • Automated Fast Approvals</span>
+        </div>
+      }
+
+      <!-- SUCCESS RECEIPT VIEW -->
+      @if (isSuccessModal() && lastWithdrawDetails()) {
+        <div class="success-screen">
+          <div class="success-icon-circle">
+            <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+          </div>
+
+          <h3 class="success-title">Withdrawal Queued!</h3>
+          <p class="success-amount">-R{{ lastWithdrawDetails()?.amount?.toFixed(2) }}</p>
+          <span class="success-desc">Your payout has been sent for processing.</span>
+
+          <div class="receipt-box">
+            <div class="receipt-row">
+              <span class="lbl">Remaining Balance</span>
+              <span class="val highlight">R{{ gameService.userBalance().toFixed(2) }}</span>
+            </div>
+            <div class="receipt-row">
+              <span class="lbl">Sent To</span>
+              <span class="val">{{ lastWithdrawDetails()?.destination }}</span>
+            </div>
+            <div class="receipt-row">
+              <span class="lbl">Transaction ID</span>
+              <span class="val mono">{{ lastWithdrawDetails()?.txId }}</span>
+            </div>
+          </div>
+
+          <button type="button" class="btn-withdraw-submit" (click)="finishWithdraw()">
+            Done & Return to Game
+          </button>
+        </div>
+      }
+
+    </div>
+  </div>
+}
