@@ -2,12 +2,18 @@
 
 <div align="center">
 
-  <!-- ======================================================== -->
-  <!-- 📸 HERO IMAGE PLACEHOLDER (REPLACE WITH YOUR IMAGE URL) -->
-  <!-- ======================================================== -->
-  <img src="YOUR_IMAGE_URL_HERE" alt="SmartBet Aviator Gameplay Preview" width="100%" style="max-width: 1000px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6); margin-bottom: 20px;" />
+  <!-- ================================================================= -->
+  <!-- 🎥 VIDEO / GIF / IMAGE PLACEHOLDER (REPLACE WITH YOUR MEDIA URL)   -->
+  <!-- ================================================================= -->
+  <!-- OPTION 1: MP4 / WebM Video (GitHub supports direct video embedding) -->
+  <video src="YOUR_VIDEO_OR_GIF_URL_HERE" width="100%" controls autoplay loop muted playsinline style="max-width: 1000px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6); margin-bottom: 20px;">
+    Your browser does not support the video tag.
+  </video>
+
+  <!-- OPTION 2: Animated GIF / Image (Fallback if using .gif or .png) -->
+  <!-- <img src="YOUR_VIDEO_OR_GIF_URL_HERE" alt="SmartBet Aviator Gameplay Demo" width="100%" style="max-width: 1000px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6); margin-bottom: 20px;" /> -->
   
-  <p><em>Replace <code>YOUR_IMAGE_URL_HERE</code> above with your screenshot or demo GIF.</em></p>
+  <p><em>Replace <code>YOUR_VIDEO_OR_GIF_URL_HERE</code> above with your MP4 video URL or animated GIF.</em></p>
 
   [![Angular](https://img.shields.io/badge/Angular-20.0-DD0031?style=for-the-badge&logo=angular&logoColor=white)](https://angular.dev/)
   [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
