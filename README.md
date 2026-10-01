@@ -2,18 +2,10 @@
 
 <div align="center">
 
-  <!-- ================================================================= -->
-  <!-- 🎥 VIDEO / GIF / IMAGE PLACEHOLDER (REPLACE WITH YOUR MEDIA URL)   -->
-  <!-- ================================================================= -->
-  <!-- OPTION 1: MP4 / WebM Video (GitHub supports direct video embedding) -->
-  <video src="YOUR_VIDEO_OR_GIF_URL_HERE" width="100%" controls autoplay loop muted playsinline style="max-width: 1000px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6); margin-bottom: 20px;">
+  <!-- Live Gameplay Video Demo -->
+  <video src="https://firebasestorage.googleapis.com/v0/b/huntic-ab5f7.firebasestorage.app/o/demo_2.mp4?alt=media&token=a3b9fb3d-157c-4231-acef-919f65354084" width="100%" controls autoplay loop muted playsinline style="max-width: 1000px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6); margin-bottom: 20px;">
     Your browser does not support the video tag.
   </video>
-
-  <!-- OPTION 2: Animated GIF / Image (Fallback if using .gif or .png) -->
-  <!-- <img src="YOUR_VIDEO_OR_GIF_URL_HERE" alt="SmartBet Aviator Gameplay Demo" width="100%" style="max-width: 1000px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6); margin-bottom: 20px;" /> -->
-  
-  <p><em>Replace <code>YOUR_VIDEO_OR_GIF_URL_HERE</code> above with your MP4 video URL or animated GIF.</em></p>
 
   [![Angular](https://img.shields.io/badge/Angular-20.0-DD0031?style=for-the-badge&logo=angular&logoColor=white)](https://angular.dev/)
   [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -150,15 +142,12 @@ This frontend connects to the companion ASP.NET Core SignalR backend:
 
 ---
 
-## 📸 Adding Screenshots
+## 🎬 Gameplay Demo
 
-To add your gameplay screenshot to this README:
-1. Upload your image to GitHub or an image host.
-2. In `README.md`, find:
-   ```html
-   <img src="YOUR_IMAGE_URL_HERE" alt="SmartBet Aviator Gameplay Preview" ... />
-   ```
-3. Replace `YOUR_IMAGE_URL_HERE` with your image link (e.g. `https://your-domain.com/screenshot.png` or relative path `./docs/preview.png`).
+The gameplay recording showcases:
+- High-precision 60 FPS HTML5 Canvas flight trajectory and particle physics
+- Real-time multiplier synchronization via SignalR
+- Dual betting panel operation with instant cashout response
 
 ---
 
