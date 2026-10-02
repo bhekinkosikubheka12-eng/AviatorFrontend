@@ -2,10 +2,14 @@
 
 <div align="center">
 
-  <!-- Live Gameplay Video Demo -->
-  <video src="https://firebasestorage.googleapis.com/v0/b/huntic-ab5f7.firebasestorage.app/o/demo_2.mp4?alt=media&token=a3b9fb3d-157c-4231-acef-919f65354084" width="100%" controls autoplay loop muted playsinline style="max-width: 1000px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6); margin-bottom: 20px;">
+  <!-- Live Gameplay Video Demo (Native In-Repo Video) -->
+  <video src="assets/demo_2.mp4" controls="controls" autoplay loop muted playsinline style="max-width: 1000px; width: 100%; border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6); margin-bottom: 16px;">
     Your browser does not support the video tag.
   </video>
+
+  <p>
+    🎬 <strong><a href="https://firebasestorage.googleapis.com/v0/b/huntic-ab5f7.firebasestorage.app/o/demo_2.mp4?alt=media&token=a3b9fb3d-157c-4231-acef-919f65354084" target="_blank">Click here to open/download full 60 FPS video directly</a></strong>
+  </p>
 
   [![Angular](https://img.shields.io/badge/Angular-20.0-DD0031?style=for-the-badge&logo=angular&logoColor=white)](https://angular.dev/)
   [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
